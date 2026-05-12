@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Corte y Cierre — GF Diversiones</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════ VARIABLES ══════════════════════════════════════ */
+    :root {
+      --bg:           #F5F5F5;
+      --surface:      #FFFFFF;
+      --surface2:     #F0F0F0;
+      --surface3:     #E8E8E8;
+      --border:       #DEDEDE;
+      --accent:       #F97316;
+      --accent-light: #FB923C;
+      --accent-dim:   rgba(249,115,22,0.10);
+      --text:         #1A1A1A;
+      --text-dim:     #555;
+      --text-muted:   #999;
+      --success:      #16A34A;
+      --success-dim:  rgba(22,163,74,0.10);
+      --error:        #DC2626;
+      --error-dim:    rgba(220,38,38,0.10);
+      --warning:      #D97706;
+      --warn-dim:     rgba(217,119,6,0.10);
+      --purple:       #7C3AED;
+      --purple-dim:   rgba(124,58,237,0.10);
+      --r:            12px;
+      --r-sm:         8px;
+      --r-lg:         20px;
+      --t:            0.2s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100%;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    #root { min-height: 100vh; }
+
+
+    /* ══════════════════════ MEJORAS V2 ══════════════════════ */
+
+    /* Sombras para tema claro */
+    .status-card, .action-card, .intro-item, .neto-card, .ev-row {
+      box-shadow: 0 1px 3px rgba(0,0,0,.07);
+    }
+    .screen-header { box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+    /* Importe + comentario por evidencia */
+    .ev-campos { display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+    .ev-campo-label { font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); }
+    .ev-importe-wrap { position:relative; }
+    .ev-peso { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:14px; pointer-events:none; }
+    .ev-importe { background:var(--surface2); border:1px solid var(--border); border-radius:var(--r-sm); padding:12px 14px 12px 28px; font-size:15px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; width:100%; -webkit-appearance:none; transition:border-color var(--t); }
+    .ev-importe:focus { border-color:var(--accent); background:var(--surface); }
+    .ev-comentario { background:var(--surface2); border:1px solid var(--border); border-radius:var(--r-sm); padding:12px 14px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; width:100%; resize:none; min-height:72px; transition:border-color var(--t); }
+    .ev-comentario:focus { border-color:var(--accent); background:var(--surface); }
+
+    /* Multi-foto grid */
+    .fotos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .foto-thumb-wrap { position:relative; border-radius:var(--r-sm); overflow:hidden; aspect-ratio:1; background:var(--surface2); }
+    .foto-thumb { width:100%; height:100%; object-fit:cover; display:block; }
+    .foto-del { position:absolute; top:4px; right:4px; background:rgba(220,38,38,.85); color:#fff; border:none; border-radius:50%; width:22px; height:22px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; }
+    .fotos-add-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px; }
+    .btn-foto-add { background:var(--surface2); border:1.5px dashed var(--border); border-radius:var(--r-sm); padding:14px 10px; text-align:center; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text-dim); transition:all var(--t); -webkit-tap-highlight-color:transparent; }
+    .btn-foto-add:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-dim); }
+    .btn-foto-add .bfa-icon { font-size:22px; display:block; margin-bottom:4px; }
+
+    /* Reporte evidencias */
+    .reporte-section { display:flex; flex-direction:column; gap:8px; }
+    .reporte-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+    .reporte-card-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .reporte-card-icon { font-size:16px; }
+    .reporte-card-title { font-size:13px; font-weight:600; flex:1; }
+    .reporte-card-status { font-size:11px; font-weight:600; }
+    .reporte-card-status.listo   { color:var(--success); }
+    .reporte-card-status.omitida { color:var(--text-muted); }
+    .reporte-card-meta { font-size:12px; color:var(--text-dim); display:flex; flex-direction:column; gap:3px; }
+    .reporte-card-fotos { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+    .reporte-foto-mini { width:56px; height:56px; object-fit:cover; border-radius:var(--r-sm); border:1px solid var(--border); cursor:pointer; }
+
+    /* Resumen financiero */
+    .resumen-financiero { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; }
+    .resumen-fin-row { display:flex; justify-content:space-between; align-items:center; padding:10px 16px; border-bottom:1px solid var(--border); font-size:13px; }
+    .resumen-fin-row:last-child { border-bottom:none; }
+    .resumen-fin-label { color:var(--text-dim); }
+    .resumen-fin-valor { font-weight:600; }
+    .resumen-fin-neto  { background:var(--accent-dim); }
+    .resumen-fin-neto .resumen-fin-label { color:var(--accent); font-weight:700; font-size:14px; }
+    .resumen-fin-neto .resumen-fin-valor { color:var(--accent); font-size:18px; font-weight:700; }
+    .resumen-fin-alert { color:var(--error) !important; }
+
+    /* Foto ampliada modal */
+    .foto-modal { position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:999; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .foto-modal img { max-width:100%; max-height:90vh; border-radius:var(--r); object-fit:contain; }
+    .foto-modal-close { position:absolute; top:16px; right:16px; background:rgba(255,255,255,.15); border:none; color:#fff; font-size:22px; width:40px; height:40px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+
+    /* Botón editar en resumen */
+    .btn-editar-ev { background:none; border:1px solid var(--border); border-radius:var(--r-sm); padding:5px 12px; font-size:11px; font-weight:600; color:var(--text-dim); cursor:pointer; font-family:'DM Sans',sans-serif; transition:all var(--t); }
+    .btn-editar-ev:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* Badge arqueo */
+    .badge-arqueo { background:rgba(22,163,74,.12); color:var(--success); }
+
+    /* ═══════════════════════════════════════ UTILS ══════════════════════════════════════════ */
+    .fade-in  { animation: fadeIn  0.30s ease; }
+    .slide-up { animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1); }
+
+    @keyframes fadeIn  { from { opacity:0; transform:translateY(8px) }  to { opacity:1; transform:none } }
+    @keyframes slideUp { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:none } }
+
+    @keyframes spin  { to { transform:rotate(360deg) } }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
+
+    .spinner {
+      display:inline-block; width:18px; height:18px;
+      border:2px solid rgba(255,255,255,.25); border-top-color:#fff;
+      border-radius:50%; animation:spin .7s linear infinite;
+      vertical-align:middle; margin-right:8px;
+    }
+
+    /* ═══════════════════════════════════════ BOTONES ════════════════════════════════════════ */
+    .btn {
+      font-family:'DM Sans',sans-serif; cursor:pointer; width:100%;
+      border-radius:var(--r-sm); padding:17px 24px; font-size:15px; font-weight:600;
+      border:none; transition:all var(--t); -webkit-tap-highlight-color:transparent;
+    }
+    .btn:active   { transform:scale(0.98); }
+    .btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+
+    .btn-primary  { background:var(--accent); color:#fff; }
+    .btn-primary:hover:not(:disabled) { background:var(--accent-light); }
+
+    .btn-secondary {
+      background:var(--surface2); color:var(--text);
+      border:1px solid var(--border); font-weight:500;
+    }
+    .btn-secondary:hover:not(:disabled) { background:var(--surface3); }
+
+    .btn-ghost {
+      background:none; color:var(--text-dim);
+      border:1px solid var(--border); width:auto; padding:8px 14px;
+      font-size:12px; font-weight:500;
+    }
+    .btn-ghost:hover { border-color:var(--error); color:var(--error); }
+
+    .btn-icon {
+      width:44px; height:44px; padding:0; border-radius:var(--r-sm);
+      display:flex; align-items:center; justify-content:center;
+      background:transparent; border:none; color:var(--text-dim);
+      cursor:pointer; font-size:18px; transition:background var(--t), color var(--t);
+      -webkit-tap-highlight-color:transparent;
+    }
+    .btn-icon:hover { background:var(--surface2); color:var(--text); }
+
+    .eye-icon {
+      position:relative; width:23px; height:14px; display:inline-block;
+      border:2px solid currentColor; border-radius:50%;
+    }
+    .eye-icon::before {
+      content:""; position:absolute; width:6px; height:6px;
+      left:50%; top:50%; transform:translate(-50%,-50%);
+      background:currentColor; border-radius:50%;
+    }
+    .eye-icon::after {
+      content:""; position:absolute; left:-3px; right:-3px; top:-4px; height:0;
+      background:var(--surface); border-bottom:2px solid currentColor;
+      border-radius:0 0 999px 999px; opacity:0; transform-origin:top;
+    }
+    .eye-icon.blinking::after { animation:eyeBlink 1.35s ease-in-out infinite; }
+    @keyframes eyeBlink {
+      0%, 38%, 58%, 100% { height:0; opacity:0; }
+      46%, 50% { height:20px; opacity:1; }
+    }
+
+    /* ═══════════════════════════════════════ INPUTS ═════════════════════════════════════════ */
+    .field { display:flex; flex-direction:column; gap:8px; }
+
+    .field-label {
+      font-size:11px; font-weight:600; letter-spacing:.12em;
+      text-transform:uppercase; color:var(--text-dim);
+    }
+
+    .field-input {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--r-sm); padding:16px 18px;
+      font-size:16px; font-family:'DM Sans',sans-serif; color:var(--text);
+      outline:none; width:100%; transition:border-color var(--t), background var(--t);
+      -webkit-appearance:none;
+    }
+    .field-input::placeholder { color:var(--text-muted); }
+    .field-input:focus    { border-color:var(--accent); background:var(--surface2); }
+    .field-input.has-error { border-color:var(--error); }
+
+    /* ═══════════════════════════════════════ MENSAJES ═══════════════════════════════════════ */
+    .msg {
+      border-radius:var(--r-sm); padding:12px 16px;
+      font-size:13px; line-height:1.5; text-align:center;
+    }
+    .msg-error   { background:var(--error-dim);   border:1px solid rgba(239,68,68,.3);   color:var(--error); }
+    .msg-success { background:var(--success-dim); border:1px solid rgba(34,197,94,.3);  color:var(--success); }
+    .msg-warn    { background:var(--warn-dim);    border:1px solid rgba(245,158,11,.3); color:var(--warning); }
+
+    /* ═══════════════════════════════════════ HEADER DE PANTALLA ═════════════════════════════ */
+    .screen-header {
+      background:var(--surface); border-bottom:1px solid var(--border);
+      padding:14px 18px; display:flex; align-items:center; gap:12px;
+      position:sticky; top:0; z-index:10;
+    }
+    .header-back {
+      width:36px; height:36px; background:var(--surface2); border:1px solid var(--border);
+      border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center;
+      cursor:pointer; flex-shrink:0; color:var(--text-dim); font-size:20px;
+      -webkit-tap-highlight-color:transparent; transition:background var(--t);
+    }
+    .header-back:hover { background:var(--surface3); }
+
+    .header-title { font-size:15px; font-weight:600; color:var(--text); }
+    .header-sub   { font-size:12px; color:var(--text-dim); margin-top:1px; }
+
+    /* ═══════════════════════════════════════ LOGIN ══════════════════════════════════════════ */
+    .login-screen {
+      min-height:100vh; display:flex; flex-direction:column;
+      position:relative; overflow:hidden;
+    }
+
+    .login-bg {
+      position:absolute; inset:0; z-index:0;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% -10%, rgba(249,115,22,.12) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 40% at 90% 110%,  rgba(249,115,22,.05) 0%, transparent 55%),
+        var(--bg);
+    }
+    .login-grid {
+      position:absolute; inset:0; z-index:0;
+      background-image:
+        linear-gradient(rgba(249,115,22,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(249,115,22,.06) 1px, transparent 1px);
+      background-size:44px 44px;
+    }
+
+    .login-content {
+      position:relative; z-index:1; flex:1;
+      display:flex; flex-direction:column; justify-content:center;
+      padding:40px 26px; max-width:420px; margin:0 auto; width:100%;
+    }
+
+    .login-badge {
+      display:inline-flex; align-items:center; gap:9px;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:100px; padding:9px 18px; margin-bottom:22px;
+    }
+    .login-badge-dot {
+      width:7px; height:7px; background:var(--accent);
+      border-radius:50%; animation:pulse 2.5s ease-in-out infinite;
+    }
+    .login-badge-text {
+      font-size:11px; font-weight:600; letter-spacing:.15em;
+      text-transform:uppercase; color:var(--text-dim);
+    }
+
+    .login-title {
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(54px,13vw,76px); line-height:.93; letter-spacing:.02em;
+    }
+    .login-title span { color:var(--accent); }
+    .login-subtitle { margin-top:11px; font-size:14px; color:var(--text-dim); font-weight:300; }
+
+    .login-form { margin-top:38px; display:flex; flex-direction:column; gap:16px; }
+
+    .app-version {
+      margin-top:18px; text-align:center; font-size:11px; color:var(--text-muted);
+      letter-spacing:.08em; text-transform:uppercase;
+    }
+
+    /* ═══════════════════════════════════════ QUIEN ERES ═════════════════════════════════════ */
+    .quien-screen { min-height:100vh; display:flex; flex-direction:column; }
+
+    .quien-body { flex:1; padding:32px 24px; max-width:420px; margin:0 auto; width:100%; }
+
+    .quien-title {
+      font-family:'Bebas Neue',sans-serif; font-size:44px;
+      line-height:.95; margin-bottom:10px;
+    }
+    .quien-desc { font-size:14px; color:var(--text-dim); line-height:1.65; margin-bottom:30px; }
+
+    /* ═══════════════════════════════════════ HOME ═══════════════════════════════════════════ */
+    .home-screen { min-height:100vh; display:flex; flex-direction:column; }
+
+    .home-header {
+      background:var(--surface); border-bottom:1px solid var(--border);
+      padding:15px 20px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .home-brand {
+      font-size:10px; font-weight:700; letter-spacing:.14em;
+      text-transform:uppercase; color:var(--accent); margin-bottom:3px;
+    }
+    .home-nombre { font-size:16px; font-weight:600; }
+
+    .home-body {
+      flex:1; padding:22px 20px 40px;
+      max-width:500px; margin:0 auto; width:100%;
+      display:flex; flex-direction:column; gap:24px;
+    }
+
+    /* Saludo */
+    .greeting-label {
+      font-size:11px; font-weight:600; letter-spacing:.12em;
+      text-transform:uppercase; color:var(--text-muted); margin-bottom:4px;
+    }
+    .greeting-title {
+      font-family:'Bebas Neue',sans-serif; font-size:38px; line-height:1;
+    }
+    .greeting-date { margin-top:5px; font-size:13px; color:var(--text-dim); }
+
+    /* Status del día */
+    .status-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+    .status-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--r); padding:15px;
+    }
+    .status-card-label {
+      font-size:11px; font-weight:600; letter-spacing:.1em;
+      text-transform:uppercase; color:var(--text-muted); margin-bottom:9px;
+    }
+    .status-pill {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:11px; font-weight:600; padding:4px 10px;
+      border-radius:100px;
+    }
+    .status-pill.pendiente { background:var(--warn-dim);    color:var(--warning); }
+    .status-pill.listo     { background:var(--success-dim); color:var(--success); }
+    .status-pill.vacio     { background:var(--surface2);    color:var(--text-muted); }
+
+    .status-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+    /* Section title */
+    .section-label {
+      font-size:11px; font-weight:600; letter-spacing:.14em;
+      text-transform:uppercase; color:var(--text-muted);
+    }
+
+    /* Tarjetas de acción */
+    .action-list { display:flex; flex-direction:column; gap:10px; }
+
+    .action-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--r); padding:18px; display:flex; align-items:center;
+      gap:15px; cursor:pointer; transition:all var(--t);
+      -webkit-tap-highlight-color:transparent; text-align:left; width:100%;
+    }
+    .action-card:hover  { border-color:var(--accent); background:var(--surface2); }
+    .action-card:active { transform:scale(0.98); }
+    .action-card.disabled { opacity:.45; cursor:not-allowed; }
+    .action-card.disabled:hover { border-color:var(--border); background:var(--surface); transform:none; }
+    .action-card.done { border-color:rgba(34,197,94,.3); }
+    .action-card.done:hover { border-color:var(--success); }
+
+    .ac-icon {
+      width:46px; height:46px; background:var(--accent-dim);
+      border-radius:var(--r-sm); display:flex; align-items:center;
+      justify-content:center; font-size:21px; flex-shrink:0;
+    }
+    .action-card.done .ac-icon { background:var(--success-dim); }
+
+    .ac-info  { flex:1; }
+    .ac-title { font-size:15px; font-weight:600; margin-bottom:3px; }
+    .ac-sub   { font-size:13px; color:var(--text-dim); }
+    .ac-arrow { color:var(--text-muted); font-size:20px; flex-shrink:0; }
+
+    /* Placeholder de fase */
+    .phase-box {
+      background:var(--surface); border:1px dashed var(--border);
+      border-radius:var(--r); padding:28px 22px; text-align:center;
+    }
+    .phase-icon  { font-size:28px; margin-bottom:10px; }
+    .phase-title { font-size:14px; font-weight:600; color:var(--text-dim); margin-bottom:5px; }
+    .phase-sub   { font-size:12px; color:var(--text-muted); line-height:1.6; }
+
+    /* Admin */
+    .role-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      border-radius:100px; padding:4px 12px;
+      font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    }
+    .role-admin  { background:var(--purple-dim); color:var(--purple); }
+    .role-maestro{ background:var(--accent-dim); color:var(--accent); }
+
+    .suc-chips   { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .suc-chip    {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:100px; padding:5px 13px; font-size:12px;
+      color:var(--text-dim); font-weight:500;
+    }
+
+    /* Responsive ajustes */
+    @media (max-height:680px) {
+      .login-content  { padding:22px 26px; }
+      .login-badge    { margin-bottom:16px; }
+      .login-form     { margin-top:22px; gap:12px; }
+    }
+
+    /* ═══════════════════════════ FASE 2 — FLUJO CIERRE ═════════════════════════════ */
+
+    /* Barra de progreso */
+    .prog-wrap { background:var(--surface2); border-radius:100px; height:3px; width:100%; margin-bottom:6px; }
+    .prog-fill  { background:var(--accent); height:3px; border-radius:100px; transition:width .4s ease; }
+    .prog-label { font-size:11px; color:var(--text-muted); display:flex; justify-content:space-between; margin-bottom:16px; }
+
+    /* Header de paso */
+    .paso-wrap  { padding:20px 20px 32px; max-width:500px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:20px; }
+    .paso-badge { display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:4px 10px; border-radius:100px; }
+    .badge-oblig { background:var(--accent-dim); color:var(--accent); }
+    .badge-opcl  { background:var(--purple-dim); color:var(--purple); }
+    .paso-num   { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.1em; }
+    .paso-titulo { font-family:'Bebas Neue',sans-serif; font-size:40px; line-height:1; margin-top:2px; }
+    .paso-inst  { font-size:14px; color:var(--text-dim); line-height:1.65; }
+
+    /* Zona de cámara */
+    .camara-zone {
+      border:2px dashed var(--border); border-radius:var(--r-lg);
+      padding:44px 20px; text-align:center; background:var(--surface);
+      cursor:pointer; transition:border-color var(--t), background var(--t);
+      -webkit-tap-highlight-color:transparent;
+    }
+    .camara-zone:hover  { border-color:var(--accent); background:var(--surface2); }
+    .camara-zone:active { transform:scale(0.98); }
+    .camara-icon  { font-size:52px; margin-bottom:10px; line-height:1; }
+    .camara-label { font-size:15px; font-weight:600; }
+    .camara-sub   { font-size:12px; color:var(--text-dim); margin-top:4px; }
+
+    /* Preview foto */
+    .preview-wrap  { position:relative; border-radius:var(--r); overflow:hidden; background:var(--surface2); }
+    .preview-img   { width:100%; max-height:280px; object-fit:cover; display:block; }
+    .preview-badge { position:absolute; top:10px; right:10px; background:rgba(0,0,0,.75); color:#fff; font-size:11px; font-weight:600; padding:4px 12px; border-radius:100px; }
+    .preview-btns  { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+    /* Subiendo */
+    .subiendo-box { text-align:center; padding:40px 20px; }
+    .subiendo-icon { font-size:40px; margin-bottom:14px; animation:spin 1s linear infinite; display:inline-block; }
+    .subiendo-txt  { font-size:15px; font-weight:600; margin-bottom:6px; }
+    .subiendo-sub  { font-size:13px; color:var(--text-dim); }
+
+    /* Pregunta SI/NO */
+    .pregunta-titulo { font-size:18px; font-weight:600; line-height:1.4; text-align:center; margin-bottom:24px; }
+    .pregunta-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .pq-btn {
+      background:var(--surface); border:2px solid var(--border);
+      border-radius:var(--r); padding:24px 16px; text-align:center;
+      cursor:pointer; transition:all var(--t); font-family:'DM Sans',sans-serif;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .pq-btn:active { transform:scale(0.97); }
+    .pq-btn.si { border-color:var(--success); background:var(--success-dim); }
+    .pq-btn.no { border-color:var(--border); }
+    .pq-btn.no:hover { border-color:var(--text-muted); }
+    .pq-icon  { font-size:32px; margin-bottom:8px; }
+    .pq-label { font-size:15px; font-weight:600; }
+    .pq-sub   { font-size:12px; color:var(--text-dim); margin-top:3px; }
+
+    /* Montos */
+    .montos-title { font-family:'Bebas Neue',sans-serif; font-size:36px; line-height:1; }
+    .montos-sub   { font-size:13px; color:var(--text-dim); margin-top:4px; margin-bottom:4px; }
+    .monto-group  { display:flex; flex-direction:column; gap:12px; }
+    .monto-field  { display:flex; flex-direction:column; gap:6px; }
+    .monto-label  { font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); }
+    .monto-input  {
+      background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm);
+      padding:14px 16px 14px 28px; font-size:17px; font-family:'DM Sans',sans-serif;
+      color:var(--text); outline:none; width:100%; -webkit-appearance:none;
+      transition:border-color var(--t);
+    }
+    .monto-input:focus { border-color:var(--accent); }
+    .monto-wrap { position:relative; }
+    .monto-peso { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:15px; font-weight:500; pointer-events:none; }
+
+    /* Sueldos */
+    .sueldo-lista { display:flex; flex-direction:column; gap:8px; }
+    .sueldo-row   { display:flex; gap:8px; align-items:center; }
+    .sueldo-nombre { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm); padding:12px 14px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; -webkit-appearance:none; }
+    .sueldo-monto  { width:110px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm); padding:12px 14px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; -webkit-appearance:none; }
+    .sueldo-nombre:focus, .sueldo-monto:focus { border-color:var(--accent); }
+    .btn-del-sueldo { background:none; border:none; cursor:pointer; color:var(--error); font-size:18px; padding:4px 6px; line-height:1; }
+    .btn-add-sueldo { background:var(--surface); border:1px dashed var(--border); border-radius:var(--r-sm); padding:10px; font-size:13px; color:var(--text-dim); cursor:pointer; width:100%; text-align:center; transition:border-color var(--t), color var(--t); font-family:'DM Sans',sans-serif; }
+    .btn-add-sueldo:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* Neto calculado */
+    .neto-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:18px 20px; display:flex; align-items:center; justify-content:space-between; }
+    .neto-left  { font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); }
+    .neto-valor { font-family:'Bebas Neue',sans-serif; font-size:42px; line-height:1; color:var(--accent); }
+    .neto-valor.negativo { color:var(--error); }
+
+    /* Resumen de evidencias */
+    .ev-lista   { display:flex; flex-direction:column; gap:6px; }
+    .ev-row     { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--surface); border-radius:var(--r-sm); border:1px solid var(--border); }
+    .ev-icon    { font-size:14px; flex-shrink:0; }
+    .ev-label   { flex:1; font-size:13px; color:var(--text); }
+    .ev-status  { font-size:11px; font-weight:600; }
+    .ev-status.listo   { color:var(--success); }
+    .ev-status.omitida { color:var(--text-muted); }
+
+    /* Pantalla éxito */
+    .exito-screen { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 24px; text-align:center; background:var(--bg); }
+    .exito-icon   { font-size:72px; margin-bottom:16px; animation:fadeIn .5s ease; }
+    .exito-titulo { font-family:'Bebas Neue',sans-serif; font-size:58px; line-height:.95; margin-bottom:10px; }
+    .exito-suc    { font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; }
+    .exito-sub    { font-size:14px; color:var(--text-dim); line-height:1.65; margin-bottom:30px; max-width:320px; }
+
+    /* Intro cierre */
+    .intro-screen { min-height:100vh; display:flex; flex-direction:column; }
+    .intro-body   { flex:1; padding:28px 22px 40px; max-width:500px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:22px; }
+    .intro-turno  { font-family:'Bebas Neue',sans-serif; font-size:52px; line-height:.95; }
+    .intro-turno span { color:var(--accent); }
+    .intro-meta   { font-size:13px; color:var(--text-dim); }
+    .intro-lista  { display:flex; flex-direction:column; gap:8px; }
+    .intro-item   { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-sm); }
+    .intro-item-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+    .intro-item-dot.oblig { background:var(--accent); }
+    .intro-item-dot.opcl  { background:var(--purple); }
+    .intro-item-txt { font-size:13px; flex:1; }
+    .intro-item-badge { font-size:10px; font-weight:600; color:var(--text-muted); }
+
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+// ═══════════════════════════════════════════════════════════════════════════════════
+// ██  CONFIGURACIÓN — CAMBIA ESTOS VALORES AL DESPLEGAR
+// ═══════════════════════════════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmo-qX9uvHpzZFZ3xUAzTOD0huuUIo08ojlpxnJ-Q4e1HCbXfXHL-u3D43vIYwk_sN8g/exec';
+const SESSION_KEY     = 'gf_corte_v1';
+const APP_VERSION     = 'Fase 2 - v1.0';
+
+const SUCURSALES = [
+  'AGUASCALIENTES LABERINTTOS','ALAIA LABERINTTOS','APODACA LABERINTTOS',
+  'CAMPESTRE LABERINTTOS','CHIHUAHUA','ESCOBEDO BRINKOS',
+  'ESCOBEDO NEON FLY','HERMOSILLO LABERINTTOS','IXTAPALUCA NEON FLY',
+  'JUAREZ 1 NEON FLY','JUAREZ 2 NEON FLY','JUAREZ 3 LABERINTTOS',
+  'LA FE','MERIDA LABERINTTOS','QUERETARO LABERINTTOS',
+  'REYNOSA NEON FLY','SALTILLO LABERINTTOS','SALTILLO NEON FLY',
+  'SAN LUIS NEON FLY','SAN ROQUE LABERINTTOS','SANTA CATARINA NEON FLY',
+  'TIJUANA NEON FLY','TOLUCA NEON FLY'
+];
+
+// ═══════════════════════════════════════════════════════════════════════════════════
+// UTILIDADES
+// ═══════════════════════════════════════════════════════════════════════════════════
+
+// Llamada al Apps Script vía fetch (compatible con Chrome Mobile)
+function callScript(params) {
+  const qs = Object.entries(params)
+    .map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
+    .join('&');
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+
+  return fetch(`${APPS_SCRIPT_URL}?${qs}`, {
+    method: 'GET',
+    redirect: 'follow',
+    signal: controller.signal
+  })
+    .then(r => {
+      clearTimeout(timeout);
+      if (!r.ok) throw new Error('Error del servidor (' + r.status + ')');
+      return r.json();
+    })
+    .catch(err => {
+      clearTimeout(timeout);
+      if (err.name === 'AbortError') {
+        throw new Error('El servidor tardó demasiado. Inténtalo de nuevo.');
+      }
+      throw new Error('Sin conexión. Verifica tu internet e inténtalo de nuevo.');
+    });
+}
+
+function jsonFetch(url, options, timeoutMs = 20000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  return fetch(url, { ...options, signal: controller.signal })
+    .then(r => {
+      clearTimeout(timeout);
+      if (!r.ok) throw new Error('Error del servidor (' + r.status + ')');
+      return r.json();
+    })
+    .catch(err => {
+      clearTimeout(timeout);
+      if (err.name === 'AbortError') {
+        throw new Error('El servidor tardó demasiado. Inténtalo de nuevo.');
+      }
+      throw err;
+    });
+}
+
+// Preparado para Fase 2: login por POST cuando Apps Script ya lo soporte.
+async function loginSeguro(params) {
+  try {
+    const res = await jsonFetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(params)
+    });
+
+    const backendSinPost = !res.success && /fase 1|implementad/i.test(String(res.error || ''));
+    if (!backendSinPost) return res;
+  } catch (err) {
+    if (err.message && err.message.includes('tardó demasiado')) throw err;
+  }
+
+  return callScript(params);
+}
+
+function getFechaLarga() {
+  return new Date().toLocaleDateString('es-MX', {
+    weekday:'long', year:'numeric', month:'long', day:'numeric'
+  });
+}
+
+// Extrae nombre corto de la sucursal (sin marca)
+function shortSuc(s) {
+  const clean = String(s || '').trim().replace(/\s+/g, ' ');
+  return clean.replace(' LABERINTTOS','').replace(' NEON FLY','').replace(' BRINKOS','');
+}
+
+function getBrand(s) {
+  const clean = String(s || '').trim().replace(/\s+/g, ' ');
+  if (clean.includes('LABERINTTOS')) return 'Laberinttos';
+  if (clean.includes('NEON FLY'))   return 'Neon Fly';
+  if (clean.includes('BRINKOS'))    return 'Brinkos';
+  return 'GF Diversiones';
+}
+
+// Verifica si la sesión guardada es del mismo día natural
+function sessionValida(sess) {
+  if (!sess) return false;
+  const d = new Date(sess.loginTime).toDateString();
+  return d === new Date().toDateString();
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════════
+// CONFIGURACIÓN FASE 2 — EVIDENCIAS
+// ═══════════════════════════════════════════════════════════════════════════════════
+const APP_VERSION2 = 'Fase 2 - v1.0';
+
+const EVIDENCIAS = {
+  'arqueo': [
+    { id:'reporte_corte',  label:'Reporte de Corte',   instruccion:'Fotografía la pantalla del Reporte de Corte en el sistema POS.',         obligatoria:true  },
+    { id:'reporte_cierre', label:'Pantalla de Cierre',  instruccion:'Fotografía la pantalla del Cierre ya grabado en el sistema.',            obligatoria:true  },
+  ],
+  1: [
+    { id:'reporte_corte',  label:'Reporte de Corte',    instruccion:'Fotografía la pantalla del Reporte de Corte en el sistema POS.',          obligatoria:true  },
+    { id:'reporte_arqueo', label:'Reporte Cierre',      instruccion:'Fotografía el reporte de cierre con el total de efectivo contado.',        obligatoria:true  },
+    { id:'vouchers',       label:'Vouchers Bancarios',  instruccion:'Fotografía los vouchers de la terminal bancaria (máx. 9 por imagen).',     obligatoria:false },
+    { id:'terminal',       label:'Resumen de Terminal', instruccion:'Fotografía el resumen de ventas impreso por la terminal bancaria.',         obligatoria:false },
+    { id:'cancelados',     label:'Tickets Cancelados',  instruccion:'Fotografía los tickets de cancelaciones del turno.',                       obligatoria:false },
+    { id:'gastos',         label:'Tickets de Gastos',   instruccion:'Fotografía los comprobantes de gastos autorizados por gerencia.',          obligatoria:false },
+    { id:'sobre_frente',   label:'Sobre — Frente',      instruccion:'Fotografía el frente del sobre sellado. Asegúrate que se vean los datos.',  obligatoria:true  },
+    { id:'sobre_reverso',  label:'Sobre — Reverso',     instruccion:'Fotografía el reverso del sobre sellado.',                                 obligatoria:true  },
+  ],
+  2: [
+    { id:'reporte_corte',  label:'Reporte de Corte',    instruccion:'Fotografía la pantalla del Reporte de Corte en el sistema POS.',           obligatoria:true  },
+    { id:'reporte_cierre', label:'Pantalla de Cierre',  instruccion:'Fotografía la pantalla del Cierre 2 ya grabado en el sistema.',            obligatoria:true  },
+    { id:'vouchers',       label:'Vouchers Bancarios',  instruccion:'Fotografía los vouchers de la terminal bancaria (máx. 9 por imagen).',     obligatoria:false },
+    { id:'terminal',       label:'Resumen de Terminal', instruccion:'Fotografía el resumen de ventas impreso por la terminal bancaria.',         obligatoria:false },
+    { id:'cancelados',     label:'Tickets Cancelados',  instruccion:'Fotografía los tickets de cancelaciones del turno.',                       obligatoria:false },
+    { id:'gastos',         label:'Tickets de Gastos',   instruccion:'Fotografía los comprobantes de gastos autorizados por gerencia.',          obligatoria:false },
+    { id:'sobre_frente',   label:'Sobre — Frente',      instruccion:'Fotografía el frente del sobre sellado. Asegúrate que se vean los datos.',  obligatoria:true  },
+    { id:'sobre_reverso',  label:'Sobre — Reverso',     instruccion:'Fotografía el reverso del sobre sellado.',                                 obligatoria:true  },
+  ]
+};
+
+const ARCHIVO_LABELS = {
+  reporte_corte:  'ReporteCorte',
+  reporte_arqueo: 'Arqueo',
+  reporte_cierre: 'ReporteCierre',
+  vouchers:       'VouchersBancarios',
+  terminal:       'ReporteTerminal',
+  cancelados:     'TicketsCancelados',
+  gastos:         'TicketsGastos',
+  sobre_frente:   'SobreFrente',
+  sobre_reverso:  'SobreReverso',
+};
+
+
+// Configuración de campo importe por evidencia
+const IMPORTE_CONFIG = {
+  vouchers:       { label: 'Total Pago con Tarjeta',    placeholder: 'Suma de vouchers',        tipo: 'tarjeta'    },
+  terminal:       { label: 'Total Pago con Tarjeta',    placeholder: 'Total del resumen',        tipo: 'tarjeta'    },
+  gastos:         { label: 'Total Gastos',               placeholder: 'Suma de tickets de gasto', tipo: 'gastos'     },
+  cancelados:     { label: 'No. de Tickets Cancelados', placeholder: 'Cantidad de cancelaciones',tipo: 'cancelados' },
+  sobre_frente:   { label: 'Efectivo Neto',              placeholder: 'Total en el sobre',        tipo: 'efectivo_neto'},
+  reporte_corte:  { label: 'Total de Tickets',           placeholder: 'No. de tickets del turno', tipo: 'total_tickets'},
+  reporte_arqueo: { label: 'Total Efectivo Contado',     placeholder: 'Total contado en arqueo',  tipo: 'efectivo_contado'},
+  reporte_cierre: { label: 'Total Efectivo Contado',     placeholder: 'Total contado en cierre',  tipo: 'efectivo_contado'},
+  sobre_reverso:  { label: 'No. de Tickets',             placeholder: 'Cantidad de tickets',       tipo: null         },
+  default:        { label: 'Importe',                    placeholder: '0.00',                     tipo: null         },
+};
+
+// ─── Utilidades de fecha ──────────────────────────────────────────────────────
+function getFechaArchivo() {
+  const n = new Date();
+  return `${String(n.getDate()).padStart(2,'0')}-${String(n.getMonth()+1).padStart(2,'0')}-${n.getFullYear()}`;
+}
+function getMesNombre() {
+  return ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO',
+          'JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'][new Date().getMonth()];
+}
+function getAnio() { return String(new Date().getFullYear()); }
+function getHoraCorta() {
+  const n = new Date();
+  return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+}
+
+
+// Extrae montos automáticos de los registros de evidencias
+function calcularMontosAuto(registros) {
+  const auto = {
+    tarjeta:          null,
+    gastos:           null,
+    cancelados:       null,
+    efectivo_neto:    null,
+    total_tickets:    null,
+    efectivo_contado: null,
+  };
+
+  for (const reg of registros) {
+    if (reg.estado !== 'listo' || !reg.importe) continue;
+    const val = parseFloat(reg.importe);
+    if (isNaN(val)) continue;
+    const cfg = IMPORTE_CONFIG[reg.id] || IMPORTE_CONFIG.default;
+    if (!cfg.tipo) continue;
+
+    // Solo toma el primero (vouchers tiene prioridad sobre terminal para tarjeta)
+    if (cfg.tipo === 'tarjeta' && auto.tarjeta === null) {
+      auto.tarjeta = val;
+    } else if (cfg.tipo === 'gastos' && auto.gastos === null) {
+      auto.gastos = val;
+    } else if (cfg.tipo === 'cancelados' && auto.cancelados === null) {
+      auto.cancelados = val;
+    } else if (cfg.tipo === 'efectivo_neto' && auto.efectivo_neto === null) {
+      auto.efectivo_neto = val;
+    } else if (cfg.tipo === 'total_tickets' && auto.total_tickets === null) {
+      auto.total_tickets = val;
+    } else if (cfg.tipo === 'efectivo_contado' && auto.efectivo_contado === null) {
+      auto.efectivo_contado = val;
+    }
+  }
+  return auto;
+}
+
+// ─── Comprimir imagen ─────────────────────────────────────────────────────────
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1600;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else       { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = () => reject(new Error('No se pudo procesar la imagen'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('No se pudo leer el archivo'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// ─── Subir foto a Drive vía Apps Script ──────────────────────────────────────
+async function subirFoto(payload) {
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    redirect: 'follow',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'subirFoto', ...payload })
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  if (!data.success) throw new Error(data.error || 'Error en servidor');
+  return data;
+}
+
+// ─── Clave de bloqueo local ───────────────────────────────────────────────────
+function claveBloqueo(sucursal, turno) {
+  return `gf_cierre_${sucursal}_${getFechaArchivo()}_t${turno}`;
+}
+function marcarCompleto(sucursal, turno) {
+  localStorage.setItem(claveBloqueo(sucursal, turno), 'listo');
+}
+function estaCompleto(sucursal, turno) {
+  return localStorage.getItem(claveBloqueo(sucursal, turno)) === 'listo';
+}
+
+// ─── Formato moneda ───────────────────────────────────────────────────────────
+function fmtPeso(n) {
+  if (isNaN(n)) return '$0.00';
+  return '$' + Number(n).toLocaleString('es-MX', { minimumFractionDigits:2, maximumFractionDigits:2 });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════
+// FLUJO CIERRE — Componente principal Fase 2
+// ═══════════════════════════════════════════════════════════════════════════════════
+function FlujoCierre({ session, turno, onVolver, onCompletado }) {
+  const { useState: useS, useRef: useR, useEffect: useE } = React;
+
+  const pasos     = EVIDENCIAS[turno];
+  const fechaArch = getFechaArchivo();
+  const mes       = getMesNombre();
+  const anio      = getAnio();
+  const esArqueo  = turno === 'arqueo';
+
+  // Estado principal
+  const [screen,    setScreen]    = useS('intro');
+  // screen: intro|pregunta|foto|montos|reporte|resumen|exito|editando
+
+  const [pasoIdx,   setPasoIdx]   = useS(0);
+  const [registros, setRegistros] = useS([]);
+  // registro: { id, label, estado, hora, fotos:[base64], importe, comentario }
+
+  const [montosData, setMontosData] = useS({
+    tarjeta:'', efectivo:'', gastos:'', extras:'',
+    faltante:'', sobrante:'', pendiente:'',
+    sueldos:[{ nombre:'', monto:'' }]
+  });
+
+  // Estado del paso actual
+  const [fotosActuales, setFotosActuales] = useS([]);  // base64[]
+  const [importe,       setImporte]       = useS('');
+  const [comentario,    setComentario]    = useS('');
+  const [errorMsg,      setErrorMsg]      = useS('');
+  const [subiendo,      setSubiendo]      = useS(false);
+  const [fotoModal,     setFotoModal]     = useS(null); // base64 para modal
+  const [editandoIdx,   setEditandoIdx]   = useS(null); // índice del registro que se edita
+
+  const fileRef     = useR(null);
+  const galeriaRef  = useR(null);
+
+  const paso = pasos ? pasos[pasoIdx] : null;
+  const progPct = pasos ? Math.round((registros.length / pasos.length) * 100) : 0;
+
+  // ── Montos calculados ───────────────────────────────────────────────────────
+  const sueldosTotal = montosData.sueldos.reduce((s,r) => s + (parseFloat(r.monto)||0), 0);
+  const montosAuto = calcularMontosAuto(registros);
+  const efectivoNeto = (() => {
+    const ef = parseFloat(montosData.efectivo) || parseFloat(montosAuto.efectivo_contado) || 0;
+    const gs = parseFloat(montosData.gastos)   || parseFloat(montosAuto.gastos)            || 0;
+    const ex = parseFloat(montosData.extras)||0;
+    const fa = parseFloat(montosData.faltante)||0;
+    const so = parseFloat(montosData.sobrante)||0;
+    const pe = parseFloat(montosData.pendiente)||0;
+    return ef - sueldosTotal - gs - ex - fa + so - pe;
+  })();
+
+  // ── Iniciar ─────────────────────────────────────────────────────────────────
+  const iniciar = () => {
+    setPasoIdx(0); setRegistros([]); setErrorMsg('');
+    limpiarPaso();
+    setScreen(pasos[0].obligatoria ? 'foto' : 'pregunta');
+  };
+
+  const limpiarPaso = () => {
+    setFotosActuales([]); setImporte(''); setComentario(''); setErrorMsg('');
+  };
+
+  // ── Cámara / Galería ────────────────────────────────────────────────────────
+  const abrirCamara  = () => { setErrorMsg(''); fileRef.current.click(); };
+  const abrirGaleria = () => { setErrorMsg(''); galeriaRef.current.click(); };
+
+  const handleFiles = async (files) => {
+    if (!files || files.length === 0) return;
+    const nuevas = [];
+    for (const file of Array.from(files)) {
+      try {
+        const b64 = await compressImage(file);
+        nuevas.push(b64);
+      } catch(e) { /* skip */ }
+    }
+    setFotosActuales(prev => [...prev, ...nuevas]);
+  };
+
+  const handleFileChange = (e) => {
+    handleFiles(e.target.files);
+    e.target.value = '';
+  };
+
+  const eliminarFoto = (i) => setFotosActuales(prev => prev.filter((_,j)=>j!==i));
+
+  // ── Validar y avanzar paso ──────────────────────────────────────────────────
+  const confirmarPaso = async () => {
+    if (fotosActuales.length === 0) { setErrorMsg('Debes tomar o seleccionar al menos una foto.'); return; }
+    if (!importe.trim()) { setErrorMsg('El importe es obligatorio.'); return; }
+
+    setSubiendo(true); setErrorMsg('');
+    const errores = [];
+
+    for (let i = 0; i < fotosActuales.length; i++) {
+      try {
+        const nombreLimpio = (session.nombre||'Empleado').replace(/\s+/g,'');
+        const num          = String(pasoIdx+1).padStart(2,'0');
+        const sufijo       = fotosActuales.length > 1 ? `_${i+1}` : '';
+        const nombreArch   = `${num}_${ARCHIVO_LABELS[paso.id]}${sufijo}_${nombreLimpio}_${fechaArch}.jpg`;
+        await subirFoto({ sucursal:session.sucursal, turno:String(turno), fecha:fechaArch, mes, anio, nombre:session.nombre, nombreArchivo:nombreArch, base64:fotosActuales[i] });
+      } catch(e) { errores.push(e.message); }
+    }
+
+    setSubiendo(false);
+
+    if (errores.length > 0 && errores.length === fotosActuales.length) {
+      setErrorMsg('Error al subir: ' + errores[0]);
+      return;
+    }
+
+    if (editandoIdx !== null) {
+      // Modo edición — actualizar registro existente
+      setRegistros(prev => prev.map((r,i) => i === editandoIdx
+        ? { ...r, fotos:fotosActuales, importe, comentario, hora:getHoraCorta() }
+        : r
+      ));
+      setEditandoIdx(null);
+      setScreen('reporte');
+    } else {
+      setRegistros(prev => [...prev, {
+        id:paso.id, label:paso.label, estado:'listo',
+        hora:getHoraCorta(), fotos:fotosActuales, importe, comentario
+      }]);
+      limpiarPaso();
+      avanzar();
+    }
+  };
+
+  const omitir = () => {
+    setRegistros(prev => [...prev, { id:paso.id, label:paso.label, estado:'omitida', hora:null, fotos:[], importe:'', comentario:'' }]);
+    limpiarPaso();
+    avanzar();
+  };
+
+  const avanzar = () => {
+    const sig = pasoIdx + 1;
+    if (sig >= pasos.length) { setScreen('montos'); }
+    else {
+      setPasoIdx(sig);
+      setScreen(pasos[sig].obligatoria ? 'foto' : 'pregunta');
+    }
+  };
+
+  const retroceder = () => {
+    if (pasoIdx === 0) { setScreen('intro'); return; }
+    const ant = pasoIdx - 1;
+    // Restaurar datos del paso anterior si ya fue registrado
+    const regAnt = registros[ant];
+    if (regAnt) {
+      setFotosActuales(regAnt.fotos || []);
+      setImporte(regAnt.importe || '');
+      setComentario(regAnt.comentario || '');
+    } else {
+      limpiarPaso();
+    }
+    // Quitar el último registro (el del paso actual si ya estaba guardado)
+    setRegistros(prev => {
+      // Solo quitar si el último registro corresponde al paso anterior
+      // (el empleado puede estar en paso 2 sin haber registrado paso 1 aún)
+      if (prev.length > 0 && prev[prev.length - 1].id === pasos[ant].id) {
+        return prev.slice(0, -1);
+      }
+      return prev;
+    });
+    setPasoIdx(ant);
+    setScreen(pasos[ant].obligatoria ? 'foto' : 'pregunta');
+    setErrorMsg('');
+  };
+
+  // ── Editar evidencia desde reporte ─────────────────────────────────────────
+  const editarEvidencia = (i) => {
+    const reg = registros[i];
+    setEditandoIdx(i);
+    setPasoIdx(i);
+    setFotosActuales(reg.fotos || []);
+    setImporte(reg.importe || '');
+    setComentario(reg.comentario || '');
+    setErrorMsg('');
+    setScreen('foto');
+  };
+
+  // ── Montos ──────────────────────────────────────────────────────────────────
+  const setMonto  = (k,v) => setMontosData(prev => ({...prev,[k]:v}));
+  const setSueldo = (i,k,v) => setMontosData(prev => { const s=[...prev.sueldos]; s[i]={...s[i],[k]:v}; return {...prev,sueldos:s}; });
+  const addSueldo = () => setMontosData(prev => ({...prev,sueldos:[...prev.sueldos,{nombre:'',monto:''}]}));
+  const delSueldo = (i) => setMontosData(prev => ({...prev,sueldos:prev.sueldos.filter((_,j)=>j!==i)}));
+
+  // ── Enviar cierre ───────────────────────────────────────────────────────────
+  const enviarCierre = () => {
+    marcarCompleto(session.sucursal, turno);
+    setScreen('exito');
+  };
+
+  // ── Inputs ocultos ──────────────────────────────────────────────────────────
+  const inputsCamara = (
+    <React.Fragment>
+      <input ref={fileRef}    type="file" accept="image/*" capture="environment" multiple style={{display:'none'}} onChange={handleFileChange} />
+      <input ref={galeriaRef} type="file" accept="image/*"                        multiple style={{display:'none'}} onChange={handleFileChange} />
+    </React.Fragment>
+  );
+
+  // ── FOTO MODAL ──────────────────────────────────────────────────────────────
+  const modalFoto = fotoModal ? (
+    <div className="foto-modal" onClick={()=>setFotoModal(null)}>
+      <button className="foto-modal-close" onClick={()=>setFotoModal(null)}>✕</button>
+      <img src={fotoModal} alt="Foto ampliada" onClick={e=>e.stopPropagation()} />
+    </div>
+  ) : null;
+
+  // ── Sección de fotos del paso actual ────────────────────────────────────────
+  const seccionFotos = (
+    <div>
+      {fotosActuales.length > 0 && (
+        <div className="fotos-grid" style={{marginBottom:'10px'}}>
+          {fotosActuales.map((f,i) => (
+            <div key={i} className="foto-thumb-wrap">
+              <img src={f} className="foto-thumb" onClick={()=>setFotoModal(f)} alt={`Foto ${i+1}`} />
+              <button className="foto-del" onClick={()=>eliminarFoto(i)}>✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="fotos-add-grid">
+        <div className="btn-foto-add" onClick={abrirCamara}>
+          <span className="bfa-icon">📷</span>Cámara
+        </div>
+        <div className="btn-foto-add" onClick={abrirGaleria}>
+          <span className="bfa-icon">🖼️</span>Galería
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── Sección importe + comentario ────────────────────────────────────────────
+  const impCfg = paso ? (IMPORTE_CONFIG[paso.id] || IMPORTE_CONFIG.default) : IMPORTE_CONFIG.default;
+  const esCantidad = paso && (paso.id === 'cancelados' || paso.id === 'reporte_corte' || paso.id === 'sobre_reverso');
+  const seccionCampos = (
+    <div className="ev-campos">
+      <div>
+        <div className="ev-campo-label">{impCfg.label} <span style={{color:'var(--error)'}}>*</span></div>
+        <div className="ev-importe-wrap">
+          {!esCantidad && <span className="ev-peso">$</span>}
+          <input className="ev-importe" type="number"
+            placeholder={impCfg.placeholder}
+            inputMode="decimal"
+            style={{paddingLeft: esCantidad ? '14px' : '28px'}}
+            value={importe} onChange={e=>{setImporte(e.target.value);setErrorMsg('');}} />
+        </div>
+      </div>
+      <div>
+        <div className="ev-campo-label">Comentario <span style={{color:'var(--text-muted)',fontWeight:400,textTransform:'none',letterSpacing:0}}>(opcional)</span></div>
+        <textarea className="ev-comentario" placeholder="Observaciones, notas del turno..."
+          value={comentario} onChange={e=>setComentario(e.target.value)} rows={2} />
+      </div>
+    </div>
+  );
+
+  // ════════════════ RENDERS ════════════════
+
+  // ── INTRO ────────────────────────────────────────────────────────────────────
+  if (screen === 'intro') return (
+    <div className="intro-screen slide-up">
+      {inputsCamara}{modalFoto}
+      <div className="screen-header">
+        <button className="header-back" onClick={onVolver}>‹</button>
+        <div>
+          <div className="header-title">{shortSuc(session.sucursal)}</div>
+          <div className="header-sub">{getBrand(session.sucursal)} · {session.nombre}</div>
+        </div>
+      </div>
+      <div className="intro-body">
+        <div>
+          <div style={{fontSize:'11px',color:'var(--text-muted)',letterSpacing:'.12em',textTransform:'uppercase',marginBottom:'6px'}}>Registro de evidencias</div>
+          <div className="intro-turno">
+            {esArqueo ? 'ARQUEO' : <span>CIERRE <span>{turno}</span></span>}
+          </div>
+          <div className="intro-meta">{getFechaLarga()}</div>
+        </div>
+        <div>
+          <div className="section-label" style={{marginBottom:'10px'}}>Evidencias del turno</div>
+          <div className="intro-lista">
+            {pasos.map(p => (
+              <div key={p.id} className="intro-item">
+                <div className={`intro-item-dot ${p.obligatoria?'oblig':'opcl'}`} />
+                <div className="intro-item-txt">{p.label}</div>
+                <div className="intro-item-badge">{p.obligatoria ? 'Obligatoria' : 'Opcional'}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="msg msg-warn" style={{textAlign:'left'}}>
+          <strong>Antes de comenzar:</strong> Ten listo el efectivo contado, los vouchers, tickets de gastos y el sobre.
+        </div>
+        <button className="btn btn-primary" onClick={iniciar}>Comenzar →</button>
+      </div>
+    </div>
+  );
+
+  // ── PREGUNTA ─────────────────────────────────────────────────────────────────
+  if (screen === 'pregunta') return (
+    <div className="home-screen slide-up">
+      {inputsCamara}{modalFoto}
+      <div className="screen-header">
+        <button className="header-back" onClick={retroceder} aria-label="Paso anterior">‹</button>
+        <div>
+          <div className="header-title">{esArqueo?'Arqueo':'Cierre '+turno} · Paso {pasoIdx+1}/{pasos.length}</div>
+          <div className="header-sub">{shortSuc(session.sucursal)}</div>
+        </div>
+      </div>
+      <div className="paso-wrap">
+        <div>
+          <div className="prog-wrap"><div className="prog-fill" style={{width:progPct+'%'}} /></div>
+          <div className="prog-label"><span>{registros.length} de {pasos.length}</span><span>{progPct}%</span></div>
+        </div>
+        <div>
+          <span className="paso-badge badge-opcl">Opcional</span>
+          <div className="paso-titulo" style={{marginTop:'8px'}}>{paso.label}</div>
+        </div>
+        <div className="pregunta-titulo">¿Tuviste {paso.label.toLowerCase()} en este turno?</div>
+        <div className="pregunta-grid">
+          <div className="pq-btn si" onClick={()=>setScreen('foto')}>
+            <div className="pq-icon">📷</div>
+            <div className="pq-label">Sí, tengo</div>
+            <div className="pq-sub">Registrar evidencia</div>
+          </div>
+          <div className="pq-btn no" onClick={omitir}>
+            <div className="pq-icon">⏭</div>
+            <div className="pq-label">No aplica</div>
+            <div className="pq-sub">Saltar este paso</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── FOTO (captura + importe + comentario) ────────────────────────────────────
+  if (screen === 'foto') return (
+    <div className="home-screen slide-up">
+      {inputsCamara}{modalFoto}
+      <div className="screen-header">
+        {editandoIdx === null && (
+          <button className="header-back" onClick={retroceder} aria-label="Paso anterior">‹</button>
+        )}
+        <div>
+          <div className="header-title">
+            {editandoIdx !== null ? 'Editar evidencia' : `${esArqueo?'Arqueo':'Cierre '+turno} · Paso ${pasoIdx+1}/${pasos.length}`}
+          </div>
+          <div className="header-sub">{shortSuc(session.sucursal)}</div>
+        </div>
+      </div>
+      <div className="paso-wrap">
+        {editandoIdx === null && (
+          <div>
+            <div className="prog-wrap"><div className="prog-fill" style={{width:progPct+'%'}} /></div>
+            <div className="prog-label"><span>{registros.length} de {pasos.length}</span><span>{progPct}%</span></div>
+          </div>
+        )}
+        <div>
+          <span className={`paso-badge ${paso.obligatoria?'badge-oblig':'badge-opcl'}`}>
+            {paso.obligatoria?'Obligatoria':'Opcional'}
+          </span>
+          <div className="paso-titulo" style={{marginTop:'8px'}}>{paso.label}</div>
+          <div className="paso-inst">{paso.instruccion}</div>
+        </div>
+
+        {errorMsg && <div className="msg msg-error">{errorMsg}</div>}
+
+        {seccionFotos}
+        {seccionCampos}
+
+        {subiendo ? (
+          <div className="subiendo-box">
+            <div className="subiendo-icon">⏳</div>
+            <div className="subiendo-txt">Subiendo a Drive...</div>
+            <div className="subiendo-sub">No cierres la app</div>
+          </div>
+        ) : (
+          <button className="btn btn-primary" onClick={confirmarPaso}
+            disabled={fotosActuales.length === 0 || !importe.trim()}>
+            {editandoIdx !== null ? 'Guardar cambios ✓' : 'Confirmar y continuar →'}
+          </button>
+        )}
+
+        {editandoIdx !== null && (
+          <button className="btn btn-secondary" onClick={()=>{setEditandoIdx(null);setScreen('reporte');}}>
+            Cancelar
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
+  // ── MONTOS — pre-llenar automáticamente ──────────────────────────────────────
+  if (screen === 'montos') return (
+    <div className="home-screen slide-up">
+      <div className="screen-header">
+        <div>
+          <div className="header-title">Montos del turno</div>
+          <div className="header-sub">{shortSuc(session.sucursal)} · {esArqueo?'Arqueo':'Cierre '+turno}</div>
+        </div>
+      </div>
+      <div className="paso-wrap">
+        <div className="msg msg-success" style={{textAlign:'left'}}>
+          ✅ {pasos.length} evidencias registradas
+        </div>
+        {(montosAuto.tarjeta !== null || montosAuto.gastos !== null || montosAuto.efectivo_neto !== null) && (
+          <div className="msg" style={{background:'var(--accent-dim)',border:'1px solid rgba(249,115,22,.3)',color:'var(--accent)',textAlign:'left',fontSize:'12px'}}>
+            💡 Algunos montos se pre-llenaron automáticamente desde las evidencias. Puedes editarlos si es necesario.
+          </div>
+        )}
+
+        <div className="monto-group">
+          <div className="monto-field">
+            <div className="monto-label">
+              Pago con Tarjeta
+              {montosAuto.tarjeta !== null && <span style={{fontSize:'10px',color:'var(--accent)',marginLeft:'6px',fontWeight:400}}>auto-llenado</span>}
+            </div>
+            <div className="monto-wrap"><span className="monto-peso">$</span>
+              <input className="monto-input" type="number" placeholder="0.00" inputMode="decimal"
+                value={montosAuto.tarjeta !== null ? String(montosAuto.tarjeta) : '0'}
+                readOnly={true}
+                style={{background:'var(--surface2)', cursor:'not-allowed'}} /></div>
+          {montosAuto.tarjeta === null && (
+            <div style={{fontSize:'11px',color:'var(--text-muted)',marginTop:'4px'}}>
+              Se llena automáticamente desde Vouchers Bancarios
+            </div>
+          )}
+          </div>
+          <div className="monto-field">
+            <div className="monto-label">
+              Efectivo (letras azules del sistema)
+              {montosAuto.efectivo_contado !== null && <span style={{fontSize:'10px',color:'var(--accent)',marginLeft:'6px',fontWeight:400}}>auto-llenado</span>}
+            </div>
+            <div className="monto-wrap"><span className="monto-peso">$</span>
+              <input className="monto-input" type="number" placeholder="0.00" inputMode="decimal"
+                value={montosAuto.efectivo_contado !== null ? String(montosAuto.efectivo_contado) : montosData.efectivo}
+                onChange={e=>{ if(montosAuto.efectivo_contado === null) setMonto('efectivo',e.target.value); }}
+                readOnly={montosAuto.efectivo_contado !== null}
+                style={{background: montosAuto.efectivo_contado !== null ? 'var(--surface2)' : '', cursor: montosAuto.efectivo_contado !== null ? 'not-allowed' : ''}} /></div>
+          </div>
+          <div className="monto-field">
+            <div className="monto-label">Sueldos del turno</div>
+            <div className="sueldo-lista">
+              {montosData.sueldos.map((s,i) => (
+                <div key={i} className="sueldo-row">
+                  <input className="sueldo-nombre" type="text" placeholder="Nombre" value={s.nombre} onChange={e=>setSueldo(i,'nombre',e.target.value)} />
+                  <input className="sueldo-monto" type="number" placeholder="$" inputMode="decimal" value={s.monto} onChange={e=>setSueldo(i,'monto',e.target.value)} />
+                  {montosData.sueldos.length > 1 && <button className="btn-del-sueldo" onClick={()=>delSueldo(i)}>✕</button>}
+                </div>
+              ))}
+              <button className="btn-add-sueldo" onClick={addSueldo}>+ Agregar empleado</button>
+            </div>
+            {sueldosTotal > 0 && <div style={{fontSize:'12px',color:'var(--text-dim)',marginTop:'4px'}}>Total: {fmtPeso(sueldosTotal)}</div>}
+          </div>
+          {[['gastos','Gastos'],['extras','Extras'],['faltante','Faltante'],['sobrante','Sobrante'],['pendiente','Pendiente de Depositar']].map(([k,l]) => {
+            const autoVal = k === 'gastos' ? montosAuto.gastos : null;
+            return (
+            <div key={k} className="monto-field">
+              <div className="monto-label">
+                {l}
+                {autoVal !== null && <span style={{fontSize:'10px',color:'var(--accent)',marginLeft:'6px',fontWeight:400}}>auto-llenado</span>}
+              </div>
+              <div className="monto-wrap"><span className="monto-peso">$</span>
+                <input className="monto-input" type="number" placeholder="0.00" inputMode="decimal"
+                  value={autoVal !== null ? String(autoVal) : montosData[k]}
+                  onChange={e=>{ if(autoVal === null) setMonto(k,e.target.value); }}
+                  readOnly={autoVal !== null}
+                  style={{background: autoVal !== null ? 'var(--surface2)' : '', cursor: autoVal !== null ? 'not-allowed' : ''}} /></div>
+            </div>
+          );})}
+          <div className="neto-card">
+            <div className="neto-left">Efectivo Neto</div>
+            <div className={`neto-valor ${efectivoNeto<0?'negativo':''}`}>{fmtPeso(efectivoNeto)}</div>
+          </div>
+        </div>
+        <button className="btn btn-primary" onClick={()=>setScreen('reporte')}>Ver reporte →</button>
+      </div>
+    </div>
+  );
+
+  // ── REPORTE DE EVIDENCIAS ────────────────────────────────────────────────────
+  if (screen === 'reporte') return (
+    <div className="home-screen slide-up">
+      {modalFoto}
+      <div className="screen-header">
+        <button className="header-back" onClick={()=>setScreen('montos')}>‹</button>
+        <div>
+          <div className="header-title">Reporte de evidencias</div>
+          <div className="header-sub">{shortSuc(session.sucursal)} · {session.nombre}</div>
+        </div>
+      </div>
+      <div className="paso-wrap">
+
+        <div className="section-label" style={{marginBottom:'10px'}}>Evidencias capturadas</div>
+        <div className="reporte-section">
+          {registros.map((r,i) => (
+            <div key={r.id} className="reporte-card">
+              <div className="reporte-card-header">
+                <span className="reporte-card-icon">{r.estado==='listo'?'✅':'—'}</span>
+                <span className="reporte-card-title">{r.label}</span>
+                <span className={`reporte-card-status ${r.estado}`}>{r.estado==='listo'?r.hora:'Omitida'}</span>
+                {r.estado === 'listo' && (
+                  <button className="btn-editar-ev" onClick={()=>editarEvidencia(i)}>Editar</button>
+                )}
+              </div>
+              {r.estado === 'listo' && (
+                <div className="reporte-card-meta">
+                  {r.importe && (() => {
+                    const sinPeso = ['reporte_corte','cancelados','sobre_reverso'];
+                    const val = parseFloat(r.importe)||0;
+                    return <span>💰 {(IMPORTE_CONFIG[r.id]||IMPORTE_CONFIG.default).label}: <strong>{sinPeso.includes(r.id) ? r.importe : fmtPeso(val)}</strong></span>;
+                  })()}
+                  {r.comentario && <span>💬 {r.comentario}</span>}
+                  {r.fotos?.length > 0 && (
+                    <div className="reporte-card-fotos">
+                      {r.fotos.map((f,j) => (
+                        <img key={j} src={f} className="reporte-foto-mini" alt={`Foto ${j+1}`} onClick={()=>setFotoModal(f)} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="section-label" style={{marginBottom:'10px',marginTop:'8px'}}>Resumen financiero</div>
+        <div className="resumen-financiero">
+          {montosAuto.total_tickets !== null && (
+            <div className="resumen-fin-row">
+              <span className="resumen-fin-label">🎟️ Total Tickets</span>
+              <span className="resumen-fin-valor">{montosAuto.total_tickets}</span>
+            </div>
+          )}
+          {montosAuto.cancelados !== null && (
+            <div className="resumen-fin-row">
+              <span className="resumen-fin-label">❌ Tickets Cancelados</span>
+              <span className="resumen-fin-valor">{montosAuto.cancelados}</span>
+            </div>
+          )}
+          {montosAuto.efectivo_contado !== null && (
+            <div className="resumen-fin-row">
+              <span className="resumen-fin-label">💵 Efectivo Contado</span>
+              <span className="resumen-fin-valor">{fmtPeso(montosAuto.efectivo_contado)}</span>
+            </div>
+          )}
+          {[
+            ['Pago con Tarjeta', montosData.tarjeta || montosAuto.tarjeta],
+            ['Efectivo Sistema', montosData.efectivo || montosAuto.efectivo_contado],
+            ['Sueldos',          sueldosTotal],
+            ['Gastos',           montosData.gastos  || montosAuto.gastos],
+            ['Extras',           montosData.extras],
+          ].map(([l,v]) => (
+            <div key={l} className="resumen-fin-row">
+              <span className="resumen-fin-label">{l}</span>
+              <span className="resumen-fin-valor">{fmtPeso(parseFloat(v)||0)}</span>
+            </div>
+          ))}
+          {parseFloat(montosData.faltante)>0 && (
+            <div className="resumen-fin-row">
+              <span className="resumen-fin-label resumen-fin-alert">⚠️ Faltante</span>
+              <span className="resumen-fin-valor resumen-fin-alert">{fmtPeso(parseFloat(montosData.faltante)||0)}</span>
+            </div>
+          )}
+          {parseFloat(montosData.sobrante)>0 && (
+            <div className="resumen-fin-row">
+              <span className="resumen-fin-label" style={{color:'var(--success)'}}>✅ Sobrante</span>
+              <span className="resumen-fin-valor" style={{color:'var(--success)'}}>{fmtPeso(parseFloat(montosData.sobrante)||0)}</span>
+            </div>
+          )}
+          {parseFloat(montosData.pendiente)>0 && (
+            <div className="resumen-fin-row">
+              <span className="resumen-fin-label" style={{color:'var(--warning)'}}>🕐 Pdte. Depositar</span>
+              <span className="resumen-fin-valor" style={{color:'var(--warning)'}}>{fmtPeso(parseFloat(montosData.pendiente)||0)}</span>
+            </div>
+          )}
+          <div className="resumen-fin-row resumen-fin-neto">
+            <span className="resumen-fin-label">Efectivo Neto</span>
+            <span className="resumen-fin-valor">{fmtPeso(efectivoNeto)}</span>
+          </div>
+        </div>
+
+        <button className="btn btn-primary" onClick={()=>setScreen('resumen')}>Confirmar cierre →</button>
+      </div>
+    </div>
+  );
+
+  // ── RESUMEN FINAL ─────────────────────────────────────────────────────────────
+  if (screen === 'resumen') return (
+    <div className="home-screen slide-up">
+      {modalFoto}
+      <div className="screen-header">
+        <button className="header-back" onClick={()=>setScreen('reporte')}>‹</button>
+        <div>
+          <div className="header-title">Confirmar envío</div>
+          <div className="header-sub">{shortSuc(session.sucursal)} · {esArqueo?'Arqueo':'Cierre '+turno}</div>
+        </div>
+      </div>
+      <div className="paso-wrap">
+        <div className="msg msg-warn" style={{textAlign:'left'}}>
+          <strong>Revisa antes de enviar.</strong> Una vez confirmado no podrás modificar las evidencias.
+        </div>
+
+        <div>
+          <div className="section-label" style={{marginBottom:'8px'}}>Evidencias ({registros.filter(r=>r.estado==='listo').length} enviadas, {registros.filter(r=>r.estado==='omitida').length} omitidas)</div>
+          <div className="ev-lista">
+            {registros.map(r => (
+              <div key={r.id} className="ev-row">
+                <span className="ev-icon">{r.estado==='listo'?'✅':'—'}</span>
+                <span className="ev-label">{r.label}</span>
+                <span className={`ev-status ${r.estado}`}>
+                  {r.estado==='listo' ? `${r.fotos?.length||1} foto(s) · ${r.hora}` : 'Omitida'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="neto-card" style={{marginTop:'4px'}}>
+          <div className="neto-left">Efectivo Neto</div>
+          <div className={`neto-valor ${efectivoNeto<0?'negativo':''}`} style={{fontSize:'32px'}}>{fmtPeso(efectivoNeto)}</div>
+        </div>
+
+        <button className="btn btn-primary" onClick={enviarCierre}>Enviar cierre ✓</button>
+        <button className="btn btn-secondary" onClick={()=>setScreen('reporte')}>Revisar reporte</button>
+      </div>
+    </div>
+  );
+
+  // ── ÉXITO ─────────────────────────────────────────────────────────────────────
+  if (screen === 'exito') return (
+    <div className="exito-screen fade-in">
+      {modalFoto}
+      <div className="exito-icon">✅</div>
+      <div className="exito-suc">{getBrand(session.sucursal)} · {shortSuc(session.sucursal)}</div>
+      <div className="exito-titulo">{esArqueo?'ARQUEO':'CIERRE '+turno}<br/>ENVIADO</div>
+      <div className="exito-sub">
+        Todas las evidencias fueron subidas a Google Drive correctamente.
+        Registrado a nombre de <strong>{session.nombre}</strong>.
+      </div>
+      <button className="btn btn-primary" style={{maxWidth:'320px',width:'100%'}} onClick={onCompletado}>
+        Volver al inicio
+      </button>
+    </div>
+  );
+
+  return null;
+}
+
+
+function LoginScreen({ onLogin }) {
+  const [usuario,  setUsuario]  = useState('');
+  const [password, setPassword] = useState('');
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState('');
+  const [showPass, setShowPass] = useState(false);
+  const [online,   setOnline]   = useState(navigator.onLine);
+
+  useEffect(() => {
+    const updateOnline = () => setOnline(navigator.onLine);
+    window.addEventListener('online', updateOnline);
+    window.addEventListener('offline', updateOnline);
+    return () => {
+      window.removeEventListener('online', updateOnline);
+      window.removeEventListener('offline', updateOnline);
+    };
+  }, []);
+
+  const submit = async () => {
+    if (!online) {
+      setError('Sin conexión. Revisa tu internet e intenta nuevamente.');
+      return;
+    }
+    if (!usuario.trim() || !password.trim()) {
+      setError('Ingresa tu usuario y contraseña para continuar.');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const res = await callScript({
+        action: 'login',
+        u: usuario.trim().toLowerCase(),
+        p: password.trim()
+      });
+      if (res.success) {
+        onLogin(res);
+      } else {
+        setError(res.error || 'Usuario o contraseña incorrectos.');
+      }
+    } catch(err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onKey = (e) => { if (e.key === 'Enter') submit(); };
+
+  return (
+    <div className="login-screen">
+      <div className="login-bg" />
+      <div className="login-grid" />
+      <div className="login-content fade-in">
+
+        {/* Logo */}
+        <div>
+          <div className="login-badge">
+            <div className="login-badge-dot" />
+            <span className="login-badge-text">GF Diversiones</span>
+          </div>
+          <div className="login-title">
+            CORTE<br />Y <span>CIERRE</span>
+          </div>
+          <div className="login-subtitle">Registro de evidencias de cierre</div>
+        </div>
+
+        {/* Formulario */}
+        <div className="login-form">
+          {!online && <div className="msg msg-warn">Sin conexión. Revisa tu internet antes de iniciar sesión.</div>}
+          {error && <div className="msg msg-error">{error}</div>}
+
+          <div className="field">
+            <label className="field-label">Usuario</label>
+            <input
+              className={`field-input ${error ? 'has-error' : ''}`}
+              type="text" placeholder="usuario_sucursal"
+              value={usuario}
+              onChange={e => { setUsuario(e.target.value); setError(''); }}
+              onKeyDown={onKey}
+              autoCapitalize="none" autoCorrect="off" autoComplete="username"
+            />
+          </div>
+
+          <div className="field">
+            <label className="field-label">Contraseña</label>
+            <div style={{position:'relative'}}>
+              <input
+                className={`field-input ${error ? 'has-error' : ''}`}
+                type={showPass ? 'text' : 'password'} placeholder="••••••••"
+                value={password}
+                onChange={e => { setPassword(e.target.value); setError(''); }}
+                onKeyDown={onKey}
+                autoComplete="current-password"
+                style={{paddingRight:'52px'}}
+              />
+              <button
+                className="btn-icon"
+                type="button"
+                aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                onClick={() => setShowPass(p => !p)}
+                style={{
+                  position:'absolute', right:'14px', top:'50%', transform:'translateY(-50%)',
+                }}
+              >
+                <span className={`eye-icon ${showPass ? 'blinking' : ''}`} />
+              </button>
+            </div>
+          </div>
+
+          <button className="btn btn-primary" onClick={submit} disabled={loading}>
+            {loading && <span className="spinner" />}
+            {loading ? 'Verificando...' : 'Iniciar sesión'}
+          </button>
+          <div className="app-version">{APP_VERSION}</div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// QuienEresScreen legacy — reemplazada por QuienEresScreenMejorada
+
+// ═══════════════════════════════════════════════════════════════════════════════════
+// PANTALLA: ¿QUIÉN ERES? — Mejorada
+// ═══════════════════════════════════════════════════════════════════════════════════
+function QuienEresScreenMejorada({ loginData, onConfirm, onBack }) {
+  const [nombre, setNombre] = useState('');
+  const [error,  setError]  = useState('');
+
+  const confirmar = () => {
+    if (nombre.trim().length < 2) {
+      setError('Escribe tu nombre completo.');
+      return;
+    }
+    onConfirm(nombre.trim());
+  };
+
+  return (
+    <div className="quien-screen slide-up">
+      <div className="screen-header">
+        <button className="header-back" type="button" onClick={onBack} aria-label="Regresar">‹</button>
+        <div>
+          <div className="header-title">{shortSuc(loginData.sucursal)}</div>
+          <div className="header-sub">{getBrand(loginData.sucursal)}</div>
+        </div>
+      </div>
+
+      <div className="quien-body">
+        <div className="quien-title">¿QUIÉN<br />ERES?</div>
+        <div className="quien-desc">
+          Tu nombre quedará registrado en todas las evidencias
+          del cierre de este turno.
+        </div>
+
+        {error && <div className="msg msg-error" style={{marginBottom:'16px'}}>{error}</div>}
+
+        <div className="field" style={{marginBottom:'20px'}}>
+          <label className="field-label">Tu nombre completo</label>
+          <input
+            className="field-input"
+            type="text" placeholder="Ej. Emily García"
+            value={nombre}
+            onChange={e => { setNombre(e.target.value); setError(''); }}
+            onKeyDown={e => e.key === 'Enter' && confirmar()}
+            autoFocus autoComplete="name"
+          />
+        </div>
+
+        <button className="btn btn-primary" onClick={confirmar}>
+          Continuar →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+function HomeEmpleado({ session, onLogout, onIniciarCierre }) {
+  const c1  = estaCompleto(session.sucursal, 1);
+  const c2  = estaCompleto(session.sucursal, 2);
+  const cAq = estaCompleto(session.sucursal, 'arqueo');
+
+  const estadoCierre1 = c1  ? 'listo' : 'pendiente';
+  const estadoCierre2 = c2  ? 'listo' : 'vacio';
+  const estadoArqueo  = cAq ? 'listo' : 'vacio';
+  const pillLabel = { pendiente:'Pendiente', listo:'Enviado ✓', vacio:'Sin iniciar' };
+
+  return (
+    <div className="home-screen slide-up">
+      <div className="home-header">
+        <div>
+          <div className="home-brand">{getBrand(session.sucursal)} · {shortSuc(session.sucursal)}</div>
+          <div className="home-nombre">Hola, {session.nombre} 👋</div>
+        </div>
+        <button className="btn btn-ghost" onClick={onLogout}>Salir</button>
+      </div>
+
+      <div className="home-body">
+        <div>
+          <div className="greeting-label">Turno de hoy</div>
+          <div className="greeting-title">SELECCIONA<br />CIERRE</div>
+          <div className="greeting-date">{getFechaLarga()}</div>
+        </div>
+
+        <div>
+          <div className="section-label" style={{marginBottom:'10px'}}>Iniciar cierre</div>
+          <div className="action-list">
+
+            <button
+              className={`action-card ${c1 ? 'done disabled' : ''}`}
+              onClick={() => !c1 && onIniciarCierre(1)}
+              disabled={c1}
+            >
+              <div className="ac-icon">{c1 ? '✅' : '📋'}</div>
+              <div className="ac-info">
+                <div className="ac-title">Cierre 1 — Primer turno</div>
+                <div className="ac-sub">{c1 ? 'Enviado hoy ✓' : '4 obligatorias · 4 opcionales'}</div>
+              </div>
+              {!c1 && <span className="ac-arrow">›</span>}
+            </button>
+
+            <button
+              className={`action-card ${c2 ? 'done disabled' : ''}`}
+              onClick={() => !c2 && onIniciarCierre(2)}
+              disabled={c2}
+            >
+              <div className="ac-icon">{c2 ? '✅' : '📋'}</div>
+              <div className="ac-info">
+                <div className="ac-title">Cierre 2 — Segundo turno</div>
+                <div className="ac-sub">{c2 ? 'Enviado hoy ✓' : '4 obligatorias · 4 opcionales'}</div>
+              </div>
+              {!c2 && <span className="ac-arrow">›</span>}
+            </button>
+
+            <button
+              className={`action-card ${cAq ? 'done disabled' : ''}`}
+              onClick={() => !cAq && onIniciarCierre('arqueo')}
+              disabled={cAq}
+            >
+              <div className="ac-icon" style={{background:'var(--success-dim)'}}>{cAq ? '✅' : '🗂️'}</div>
+              <div className="ac-info">
+                <div className="ac-title">Arqueo</div>
+                <div className="ac-sub">{cAq ? 'Enviado hoy ✓' : '2 obligatorias · con montos'}</div>
+              </div>
+              {!cAq && <span className="ac-arrow">›</span>}
+            </button>
+
+          </div>
+        </div>
+
+        <div>
+          <div className="section-label" style={{marginBottom:'10px'}}>Estado de hoy</div>
+          <div className="status-grid">
+            <div className="status-card">
+              <div className="status-card-label">Cierre 1</div>
+              <span className={`status-pill ${estadoCierre1}`}><span className="status-dot" />{pillLabel[estadoCierre1]}</span>
+            </div>
+            <div className="status-card">
+              <div className="status-card-label">Cierre 2</div>
+              <span className={`status-pill ${estadoCierre2}`}><span className="status-dot" />{pillLabel[estadoCierre2]}</span>
+            </div>
+            <div className="status-card" style={{gridColumn:'1/-1'}}>
+              <div className="status-card-label">Arqueo</div>
+              <span className={`status-pill ${estadoArqueo}`}><span className="status-dot" />{pillLabel[estadoArqueo]}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════
+// PANTALLA: HOME ADMIN / MAESTRO
+// ═══════════════════════════════════════════════════════════════════════════════════
+function HomeAdmin({ session, onLogout }) {
+  const esMaestro  = (session.rol || '').toLowerCase() === 'maestro';
+  const sucursales = esMaestro ? SUCURSALES : (session.sucursalesAsignadas || []);
+
+  return (
+    <div className="home-screen slide-up">
+      <div className="home-header">
+        <div>
+          <div style={{marginBottom:'6px'}}>
+            <span className={`role-badge ${esMaestro ? 'role-maestro' : 'role-admin'}`}>
+              {esMaestro ? '★ Usuario maestro' : '● Administrador'}
+            </span>
+          </div>
+          <div className="home-nombre">{session.nombre || session.usuario}</div>
+        </div>
+        <button className="btn btn-ghost" onClick={onLogout}>Salir</button>
+      </div>
+
+      <div className="home-body">
+
+        <div>
+          <div className="greeting-label">Panel de control</div>
+          <div className="greeting-title">ADMINISTRACIÓN</div>
+          <div className="greeting-date">{getFechaLarga()}</div>
+        </div>
+
+        <div>
+          <div className="section-label">
+            Sucursales asignadas ({sucursales.length})
+          </div>
+          <div className="suc-chips">
+            {sucursales.length === 0
+              ? <span style={{fontSize:'13px',color:'var(--text-muted)'}}>Sin sucursales asignadas aún</span>
+              : sucursales.map(s => <span key={s} className="suc-chip">{shortSuc(s)}</span>)
+            }
+          </div>
+        </div>
+
+        <div className="phase-box">
+          <div className="phase-icon">📊</div>
+          <div className="phase-title">Panel de administración — Fase 4</div>
+          <div className="phase-sub">
+            Vista de cortes por sucursal, filtros por fecha y empleado,
+            descarga de evidencias, desbloqueo de cierres y gestión de usuarios
+            estarán disponibles en la Fase 4.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════════
+// COMPONENTE RAÍZ
+// ═══════════════════════════════════════════════════════════════════════════════════
+function App() {
+  const [screen,      setScreen]      = useState('login');
+  const [loginData,   setLoginData]   = useState(null);
+  const [session,     setSession]     = useState(null);
+  const [turnoActivo, setTurnoActivo] = useState(null);
+
+  useEffect(() => {
+    try {
+      const raw  = localStorage.getItem(SESSION_KEY);
+      const sess = raw ? JSON.parse(raw) : null;
+      if (sessionValida(sess)) { setSession(sess); setScreen('home'); }
+      else localStorage.removeItem(SESSION_KEY);
+    } catch { localStorage.removeItem(SESSION_KEY); }
+  }, []);
+
+  const onLogin = (data) => {
+    if ((data.rol || '').toLowerCase() === 'empleado') {
+      setLoginData(data); setScreen('quien');
+    } else { guardarSesion(data); }
+  };
+
+  const onQuienConfirm = (nombre) => guardarSesion({ ...loginData, nombre });
+
+  const guardarSesion = (data) => {
+    const sess = { ...data, loginTime: new Date().toISOString() };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(sess));
+    setSession(sess); setScreen('home');
+  };
+
+  const onLogout = () => {
+    if (!confirm('\u00bfSeguro que quieres cerrar sesi\u00f3n?')) return;
+    localStorage.removeItem(SESSION_KEY);
+    setSession(null); setLoginData(null); setTurnoActivo(null); setScreen('login');
+  };
+
+  const iniciarCierre = (turno) => { setTurnoActivo(turno); setScreen('cierre'); };
+  const volverAlHome  = ()      => { setTurnoActivo(null);  setScreen('home');   };
+
+  if (screen === 'login')  return <LoginScreen onLogin={onLogin} />;
+
+  if (screen === 'quien' && loginData)
+    return <QuienEresScreenMejorada loginData={loginData} onConfirm={onQuienConfirm}
+             onBack={() => { setLoginData(null); setScreen('login'); }} />;
+
+  if (screen === 'cierre' && session && turnoActivo)
+    return <FlujoCierre session={session} turno={turnoActivo}
+             onVolver={volverAlHome} onCompletado={volverAlHome} />;
+
+  if (screen === 'home' && session)
+    return (session.rol || '').toLowerCase() === 'empleado'
+      ? <HomeEmpleado session={session} onLogout={onLogout} onIniciarCierre={iniciarCierre} />
+      : <HomeAdmin    session={session} onLogout={onLogout} />;
+
+  return null;
+}
+
+// ── Render root
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
